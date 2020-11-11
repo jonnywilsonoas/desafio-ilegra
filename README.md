@@ -6,13 +6,10 @@ Desafio para vaga de dev na Ilegra
 
 ### Arquiteura
 * JAVA 8
-* H2 Database
 * Maven
 
 ### Ferramentas utilizadas
-* BeanIO
 * DevTools
 * Lombok
 * Spring boot
 * Spring Web 
-* Thymeleaf
