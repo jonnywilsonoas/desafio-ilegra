@@ -4,10 +4,12 @@ Desafio para vaga de dev na Ilegra
 ### IDE utilizada
 * Eclipse
 
-### Arquitetura e bibliotecas
+### Arquiteura
 * JAVA 8
 * Maven
 * Spring boot
+
+### Ferramentas utilizadas
 * DevTools
 * Lombok
 * commons-lang3
