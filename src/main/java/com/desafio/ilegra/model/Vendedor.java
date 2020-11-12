@@ -1,7 +1,6 @@
 package com.desafio.ilegra.model;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import java.math.BigDecimal;
 
 import lombok.Data;
 import lombok.Getter;
@@ -17,6 +16,6 @@ public class Vendedor {
 	private String name;
 	
 	@Getter @Setter
-	private double salary;
+	private BigDecimal salary;
 
 }

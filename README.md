@@ -4,15 +4,17 @@ Desafio para vaga de dev na Ilegra
 ### IDE utilizada
 * Eclipse
 
-### Arquiteura
+### Arquitetura e bibliotecas
 * JAVA 8
-* H2 Database
 * Maven
-
-### Ferramentas utilizadas
-* BeanIO
+* Spring boot
 * DevTools
 * Lombok
-* Spring boot
-* Spring Web 
-* Thymeleaf
+* commons-lang3
+* commons-io
+* log4j-core
+
+### Parametros do arquivo application.properties utilizados para endereço das pastas
+
+### RUN
+Classe com.desafio.ilegra.IlegraApplication (main do spring boot)

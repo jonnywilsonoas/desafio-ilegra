@@ -4,10 +4,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -20,12 +23,14 @@ import com.desafio.ilegra.util.ConversorUtils;
 
 
 @Controller
-public class ArquivoController {
+public class ArquivoINController {
 	
 	@Autowired
-	public ArquivoController() {
+	public ArquivoINController() {
 		
 	}
+	
+	Logger logger = LogManager.getLogger(getClass());
 	
 	/*
 	 * método que processar o arquivo encontrando no direitório IN
@@ -36,8 +41,9 @@ public class ArquivoController {
 		BufferedReader leitor = new BufferedReader(arquivoReaderIN);
 		String linha = "";
 		StringBuilder sb = null;
-	    
+		
 		Arquivo arquivo = new Arquivo();
+		arquivo.setNomeArquivo(arquivoIN.getName());
 		while((linha = leitor.readLine()) != null){
 			Cliente cliente = null;
 			Vendedor vendedor = null;
@@ -53,7 +59,7 @@ public class ArquivoController {
 						vendedor = (Vendedor) linhaToObject(sb.toString());
 						arquivo.getVendedores().add(vendedor);
 					}
-					System.out.println(sb.toString());
+					logger.info("Processando Vendedor: " + sb.toString());
 					break;
 				
 				// Cliente
@@ -63,7 +69,7 @@ public class ArquivoController {
 						cliente = (Cliente) linhaToObject(sb.toString());
 						arquivo.getClientes().add(cliente);
 					}
-					System.out.println(sb.toString());
+					logger.info("Processando Cliente: " + sb.toString());
 					break;
 			    
 				// Venda
@@ -71,10 +77,9 @@ public class ArquivoController {
 					sb = new StringBuilder(linha.trim());
 					if(linhaToObject(sb.toString()) instanceof Venda) {
 						venda = (Venda) linhaToObject(sb.toString());
-						arquivo.getVendas().add(venda);
+						arquivo.getVendas().add(venda);	
 					}
-					
-					System.out.println(sb.toString());
+					logger.info("Processando Venda: " + sb.toString());
 					break;
 					
 				case 0: 
@@ -92,8 +97,6 @@ public class ArquivoController {
 						arquivo.getVendas().remove(venda);
 						arquivo.getVendas().add((Venda) linhaConvertida);
 					}
-					
-					System.out.println(sb.toString());
 					break;
 				
 				default:
@@ -104,6 +107,9 @@ public class ArquivoController {
 		return arquivo;
 	}
 	
+	/*
+	 * método que converte uma linha num objeto do tipo Vendedor, Cliente ou Venda
+	 */
 	private Object linhaToObject(String linha){
 		String linhaSpt[] = linha.trim().split(Pattern.quote("ç"));
 		if(linhaSpt.length == 4) {
@@ -116,7 +122,7 @@ public class ArquivoController {
 					Vendedor vendedor = new Vendedor();
 					vendedor.setCpf(linhaSpt[1]);
 					vendedor.setName(linhaSpt[2]);
-					vendedor.setSalary(Double.parseDouble(linhaSpt[3]));
+					vendedor.setSalary(new BigDecimal(linhaSpt[3]));
 					return vendedor;
 
 				// Cliente	
@@ -149,11 +155,11 @@ public class ArquivoController {
 		String[] itensVendaArray = string.split(Pattern.quote(","));
 		List<ItemVenda> itensVendaList = new ArrayList<ItemVenda>();
 		for(int i = 0; i < itensVendaArray.length; i++) {
-			String[] itensVendaUnidade = string.split(Pattern.quote("-"));
+			String[] itensVendaUnidade = itensVendaArray[i].split(Pattern.quote("-"));
 			ItemVenda itemVenda = new ItemVenda();
 			itemVenda.setId(Integer.parseInt(itensVendaUnidade[0]));
 			itemVenda.setQuantity(Integer.parseInt(itensVendaUnidade[1]));
-			itemVenda.setPrice(Double.parseDouble(itensVendaUnidade[2]));
+			itemVenda.setPrice(new BigDecimal(itensVendaUnidade[2]));
 			
 			itensVendaList.add(itemVenda);
 			
@@ -169,7 +175,7 @@ public class ArquivoController {
 		try {
 			indicador = Integer.parseInt(ConversorUtils.getValorAsString(linha, 1, 3));
 		} catch (NumberFormatException e) {
-			System.out.println("linha complemento da anterior");
+			logger.info("Processando linha complementar: " + linha);
 		}
 		return indicador;
 	}

@@ -1,63 +1,75 @@
 package com.desafio.ilegra.controller;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 
+import com.desafio.ilegra.model.Arquivo;
 import com.desafio.ilegra.util.ArquivoUtils;
 
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Controller
 @NoArgsConstructor
 public class HomePathController {
 	
-//	@Value("${home.path.in}")
-	@Getter
-	private String homePathIN = "C://homepath//home//in";
-
-//	@Value("${home.path.out}")
-	@Getter
-	private String homePathOUT = "C://homepath//home//out";
+	@Value("${home.path.in}")
+	private String homePathIN; 
+	
+	@Value("${home.path.process}")
+	private String homePathProcess;
 	
 	@Autowired
-	ArquivoController arquivoController;
+	private ArquivoINController arquivoController;
 	
 	@Autowired
-	public HomePathController(ArquivoController arquivoController) {
+	public HomePathController(ArquivoINController arquivoController) {
 		this.arquivoController = arquivoController;
 	}
 	
-	public boolean verificarPastaIN() {
+	public List<Arquivo> verificarPastaIN() {
 		File diretorioVerificar = new File(homePathIN);
 		try {
-			return moverArquivosDaPastaIN(diretorioVerificar);
+			return lerPastaIN(diretorioVerificar);
 		} catch (IOException e) {
 			e.printStackTrace();
-			return false;
 		}
+		return null;
 	}
+
+	/*
+	 * ler pasta IN em busca de arquivo e caso encontre processa-os transformando em
+	 * Arquivo para o relatório
+	 */
 	
-	private boolean moverArquivosDaPastaIN(File diretorioIN) throws IOException{
+	private List<Arquivo> lerPastaIN(File diretorioIN) throws IOException{
+		ArquivoUtils.criarDiretorio(diretorioIN);
+		
 		File arquivoINList[] = diretorioIN.listFiles(); 
-		File diretorioOUT = new File(homePathOUT);
-		boolean retorno = false;
+		
+		File diretorioINProcess = new File(homePathProcess);
+		ArquivoUtils.criarDiretorio(diretorioINProcess);
+		
+		
+		List<Arquivo> arquivos = new ArrayList<Arquivo>(); 
+		
 		for (File fileIN : arquivoINList) { 
 			
-			this.arquivoController.leituraArquivo(fileIN);
+			Arquivo arquivo = this.arquivoController.leituraArquivo(fileIN);
 			
-			FileInputStream fisDestinoFinal;
-			ArquivoUtils.salvarArquivo(fileIN, new File(diretorioOUT.getPath() + File.separator + fileIN.getName()));
-    		fisDestinoFinal = new FileInputStream(new File(diretorioOUT.getPath() + File.separator + fileIN.getName()));
-        	fisDestinoFinal.close();
-        	retorno = true;
-        	fileIN.delete();
+			ArquivoUtils.salvarArquivo(fileIN, new File(diretorioINProcess.getPath() + File.separator + fileIN.getName()));
+			
+			ArquivoUtils.removerArquivo(fileIN);
+			
+			arquivos.add(arquivo);
+    		
 		}
 		System.gc();
-		return retorno;
+		return arquivos;
 	}
 }
